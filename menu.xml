@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openbox_menu>
+
+<menu id="client-menu">
+<item label="Minimize"><action name="Iconify" /></item>
+<item label="Maximize"><action name="ToggleMaximize" /></item>
+<item label="Fullscreen"><action name="ToggleFullscreen" /></item>
+<item label="Roll Up/Down"><action name="ToggleShade" /></item>
+<item label="Decorations"><action name="ToggleDecorations" /></item>
+<item label="Always on Top"><action name="ToggleAlwaysOnTop" /></item>
+<item label="Close"><action name="Close" /></item>
+<menu id="client-list-combined-menu" label="Running..." />
+</menu>
+
+<menu id="root-menu">
+<menu id="client-list-combined-menu" label="Running..." />
+<item label="Web browser"><action name="Execute" command="chromium-browser --enable-features=UseOzonePlatform,VaapiVideoDecodeLinuxGL --ozone-platform=wayland --use-gl=angle --use-angle=gl %U" /></item>
+<item label="Terminal"><action name="Execute" command="alacritty" /></item>
+<item label="Paint"><action name="Execute" command="pinta" /></item>
+<item label="Audio"><action name="Execute" command="pavucontrol" /></item>
+<item label="Virt-Manager"><action name="Execute" command="virt-manager" /></item>
+<item label="Reconfigure"><action name="Reconfigure" /></item>
+<item label="Exit"><action name="Exit" /></item>
+<item label="Poweroff"><action name="Execute" command="systemctl -i poweroff" /></item>
+</menu>
+
+</openbox_menu>

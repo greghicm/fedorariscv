@@ -1,0 +1,57 @@
+# XTerm's default colors
+
+# Default colors
+[colors.primary]
+background = '#000000'
+foreground = '#ffffff'
+
+# Normal colors
+[colors.normal]
+black   = '#000000'
+red     = '#cd0000'
+green   = '#00cd00'
+yellow  = '#cdcd00'
+blue    = '#0000ee'
+magenta = '#cd00cd'
+cyan    = '#00cdcd'
+white   = '#e5e5e5'
+
+# Bright colors
+[colors.bright]
+black   = '#7f7f7f'
+red     = '#ff0000'
+green   = '#00ff00'
+yellow  = '#ffff00'
+blue    = '#5c5cff'
+magenta = '#ff00ff'
+cyan    = '#00ffff'
+white   = '#ffffff'
+
+# Configurações da janela
+[window]
+padding.x = 10
+padding.y = 10
+dynamic_padding = true
+decorations = "full" # "full", "none", "buttonless", "transparent"
+opacity = 0.95       # 0.0 (transparente) a 1.0 (opaco)
+
+# Configurações da fonte
+[font]
+normal = { family = "IBM Plex Mono Light", style = "Regular" }
+bold = { family = "IBM Plex Mono Light", style = "Bold" }
+italic = { family = "IBM Plex Mono Light", style = "Italic" }
+bold_italic = { family = "IBM Plex Mono Light", style = "Bold Italic" }
+size = 16.0
+
+# Configurações do cursor
+[cursor]
+style = { shape = "Block", blinking = "Off" }
+# cor = "#cccccc" # Opcional: define a cor do cursor
+
+# Mapeamentos de teclas (keybindings)
+[keyboard]
+bindings = [
+  { key = "C", mods = "Control|Shift", action = "Copy" },
+  { key = "V", mods = "Control|Shift", action = "Paste" },
+  { key = "Return", mods = "Control|Shift", action = "SpawnNewInstance" }, # Abre nova instância na mesma pasta
+]
