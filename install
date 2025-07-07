@@ -1,0 +1,628 @@
+Debian Trixie
+#fallocate -l 8G disco-virtual
+#losetup /dev/loop0 -P disco-virtual
+#lsblk
+#cfdisk /dev/loop0
+GPT disk label
+128M type Efisystem
+16G type linux swap
+Restante type linux root (x86-64)
+export PATH="/usr/sbin:$PATH"
+#mkfs.vfat -F32 -n EFI /dev/loop0p1
+#mkswap -L SWAP /dev/loop0p2
+#mkfs.ext4 -L RAIZ /dev/loop0p3
+#mount /dev/loop0p3 /mnt
+#mkdir -p /mnt/boot/efi
+#mount /dev/loop0p1 /mnt/boot/efi
+#swapon /dev/loop0p2
+#systemctl start systemd-networkd
+#debootstrap --arch=amd64 trixie /mnt http://ftp.br.debian.org/debian/
+#for f in dev dev/pts proc sys sys/firmware/efi/efivars; do
+>mount --bind /$f /mnt/$f
+>done
+#cp /etc/fstab /mnt/etc/fstab
+#micro /mnt/etc/fstab
+#<disp> <mount> <type> <options> <dump> <fsck>
+LABEL=RAIZ / ext4 defaults,noatime,nodiratime 0 0
+LABEL=EFI /boot/efi vfat defaults,noatime,nodiratime 0 0
+LABEL=SWAP swap swap defaults 0 0
+#chroot /mnt
+$export LANG=C
+$export LC_ALL=C
+$apt update
+$apt modernize-sources
+$apt install micro
+$micro /etc/apt/source.list.d/debian.sources 
+Components: main contrib non-free non-free-firmware
+$apt update
+$apt install linux-image-amd64 grub-efi-amd64 intel-microcode firwmware-linux firmware-linux-nonfree firmware-realtek systemd-resolved iwd pciutils wget git bluez sudo dosfstools debootstrap rfkill bash-completion gnupg build-essential console-setup locales pipewire pipewire-pulse foot labwc pavucontrol fonts-ibm-plex gimp curl nodejs npm mpv obs-studio wl-clipboard xournal imv
+$grub-install --removable
+$update-grub
+$passwd
+#adduser carlos
+#usermod -aG sudo carlos
+$exit
+#umount -R /mnt
+#losetup -d /dev/loop0
+#reboot
+
+Configurar Bluetooth:
+#bluetoothctl
+scan on
+devices
+CA:3F:A6:10:7E:87 Teclado
+D9:46:62:EE:C5:4F Mouse
+pair xx
+connect xx
+scan off
+exit
+
+Editar boas vindas:
+#micro /etc/motd
+
+Rede ethernet:
+#ip a
+#micro /etc/systemd/network/ethernet.network
+[Match]
+Name=enxc8a3627e620b
+[Network]
+DHCP=yes
+
+Rede wifi:
+#micro /etc/sytemd/network/wlan0.network
+[Match]
+Name=wlan0
+[Network]
+DHCP=yes
+#systemctl status iwd
+#systemctl start iwd
+#iwctl
+[iwd]#device list
+[iwd]#station wlan0 scan
+[iwd]#station wlan0 get-networks
+[iwd]#station wlan0 connect SSID
+[iwd]#exit
+
+#systemctl start systemd-networkd
+#ping google.com.br
+
+Configuração:
+#dpkg-reconfigure locales
+#dpkg-reconfigure console-setup 
+#micro /etc/vconsole.conf
+XKBLAYOUT="us,br"
+XKBVARIANT="intl,abnt2"
+XKBOPTIONS="grp:shift_caps_toggle"
+#timedatectl set-timezone America/Sao_Paulo
+#hostnamectl set-hostname dell
+#reboot
+
+#systemctl start systemd-networkd
+Instalar google-chrome:
+#wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /etc/apt/keyrings/google-chrome.gpg
+#cd /etc/apt/source.list.d
+#cp debian.sources chrome.sources
+#micro chrome.sources
+Types: deb
+URIs: http://dl.google.com/linux/chrome/deb/
+Suites: stable
+Components: main
+Signed-By: /etc/apt/keyrings/google-chrome.gpg
+#apt update
+#apt install google-chrome-stable
+#rm google-chrome.list
+#su carlos
+#cd ~
+
+Configuração inicial:
+#mkdir -p ~/.config/labwc
+#micro  ~/.config/labwc/rc.xml
+<labwc_config>
+<keyboard>
+<default />
+<keybind key="W-Return"><action name="Execute" command="foot"/></keybind>
+<keybind key="W-g"><action name="Execute" command="google-chrome"/></keybind>
+</keyboard>
+</labwc_config>
+
+Configurar o foot:
+#mkdir ~/.config/foot
+#cp /etc/xdg/foot/foot.ini ~/.config/foot/foot.ini
+#micro ~/.config/foot/foot.ini
+font=IBM Plex Mono:size=12
+initial-window-mode=maximized
+
+Iniciar o labwc:
+#labwc 
+
+Configurar o chrome:
+chrome://flags
+ozone
+Prefered Ozone platform = Wayland
+audio
+Allow WebRTC to ajust the input volume = Disable
+
+Acessar google docs debian para copiar os camandos e configurações abaixo
+
+Configurar o labwc-environment:
+#micro ~/.config/labwc/environment
+XKB_DEFAULT_LAYOUT=us,br
+XKB_DEFAULT_VARIANT=intl,abnt2
+XKB_DEFAULT_MODELS=abnt,abnt2
+XKB_DEFAULT_OPTIONS=grp:shift_caps_toggle
+XCURSOR_THEME=Adwaita
+XCURSOR_SIZE=24
+
+Instalar o labwc-tema:
+#git clone https://github.com/addy-dclxvi/openbox-theme-collections.git
+#cd openbox-theme-collections/
+#cp -r Clia ~/.local/share/themes/Clia
+
+Configurar o labwc-menu:
+#micro ~/.config/labwc/menu.xml
+<openbox_menu>
+<menu id="client-menu">
+<item label="Full Screen"><action name="ToggleFullscreen" /></item>
+<separator />
+<menu id="client-list-combined-menu" label="Running..." />
+</menu>
+<menu id="root-menu">
+<item label="Google"><action name="Execute" command="google-chrome"/></item>
+<item label="Terminal"><action name="Execute" command="foot"/></item>
+<item label="Pavucontrol"><action name="Execute" command="pavucontrol"/></item>
+<item label="Gimp"><action name="Execute" command="gimp"/></item>
+<item label="OBS"><action name="Execute" command="obs"/></item>
+<item label="Exit"><action name="Exit"/></item>
+</menu>
+</openbox_menu>
+
+Configurar o labwc-rc:
+#micro ~/.config/labwc/rc.xml
+<labwc_config>
+<theme><name>Clia</name><cornerRadius>1</cornerRadius><font name="IBM Plex Mono" size="12" /></theme>
+<keyboard>
+<default />
+<keybind key="W-Return"><action name="Execute" command="foot"/></keybind>
+<keybind key="W-g"><action name="Execute" command="google-chrome"/></keybind>
+<keybind key="W-p"><action name="Execute" command="pavucontrol"/></keybind>
+<keybind key="W-Space"><action name="ShowMenu" menu="root-menu"/></keybind>
+<keybind key="W-Backspace"><action name="Togglemaximize"/></keybind>
+<keybind key="W-\"><action name="Iconify"/></keybind>
+<keybind key="W-f"><action name="ToggleFullscreen"/></keybind>
+<keybind key="W-q"><action name="Close"/></keybind>
+</keyboard>
+<mouse>
+<default />
+<context name="Root">
+<mousebind button="Right" action="Press"><action name="ShowMenu" menu="root-menu"/></mousebind>
+</context>
+</mouse>
+<windowSwitcher show="yes" preview="yes" outlines="no" allWorkspaces="no">
+<fields>
+<field content="desktop_entry_name" width="80%" />
+<field content="state" width="10%" />
+<field content="type_short" width="10%"/>
+</fields>
+</windowSwitcher>
+</labwc_config>
+
+Instalar o Gemini cli:
+#sudo npm install -g @google/gemini-cli
+#gemini
+
+Instalar o gstreamer: 
+#sudo apt install -y gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav
+
+Instalar o wf-recorder, grim, slurp e ffmpeg:
+#sudo apt install ffmpeg wf-recorder grim slurp
+
+Dicas para uso do sistema:
+Abrir vídeo:
+#mpv nomedovideo
+
+Abrir imagens:
+#imv nomedaimagem
+#imv . (navega nas imagens do diretório atual)
+setas esquerda e diretira navega entre as imagens abertas e setas para cima e baixa aumenta e diminui o zoom
+
+Abrir a imagem da câmera:
+#gst-launch-1.0 v4l2src device=/dev/video0 ! videoconvert ! waylandsink
+
+Gravar em um arquivo, uma região da tela: -- geometry "$(slurp)":
+#wf-recorder -f output.mp4 -c libx264 --geometry "0,0 1920x1080" --framerate 30 -p crf=23 --audio="AKG C44-USB Microphone Analog Stereo" --audio-codec aac
+
+Gravar a tela em vídeo para o YouTube:
+Criar o pipe nomeado:
+#mkfifo /tmp/youtube.mkv
+Iniciar o `ffmpeg` (ou `gstreamer`) lendo do pipe:
+#ffmpeg -i /tmp/youtube.mkv -c:v libx264 -preset veryfast -g 60 -keyint_min 60 -b:v 4500k -c:a aac -b:a 128k -f -f flv "rtmp://a.rtmp.youtube.com/live2/<SUA_CHAVE_DE_STREAM>"
+Em outro terminal, iniciar o `wf-recorder` escrevendo no pipe:
+#wf-recorder -f /tmp/youtube.mkv -c libx264 --framerate 30 -p crf=23 --audio --audio-codec aac
+
+#Capturar tela (printscreen):
+grim -g "$(slurp)" ~/screenshot.png
+
+Editar o grub:
+#micro /etc/default/grub
+#update-grub
+
+Desabilitar o uso do ATOMIC para evitar erros no labwc:
+#micro .bashrc
+export WLR_DRM_NO_ATOMIC=1 
+
+Repositórios Debian Trixie em /etc/apt/sources.list.d/debian.sources:
+# Modernized from /etc/apt/sources.list
+Types: deb deb-src
+URIs: http://ftp.br.debian.org/debian/
+Suites: trixie
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+# Repositório de Atualizações (updates) para Trixie
+Types: deb deb-src
+URIs: http://ftp.br.debian.org/debian/
+Suites: trixie-updates
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+# Repositório de Segurança para Trixie
+# (Lembre-se da observação: Para testing, as atualizações de segurança chegam via unstable,
+# mas esta entrada é boa para quando trixie se tornar stable ou para pacotes específicos.)
+Types: deb deb-src
+URIs: http://ftp.br.debian.org/debian-security/
+Suites: trixie-security
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+# Repositório de Backports para Trixie (Opcional, para software mais recente)
+Types: deb deb-src
+URIs: http://ftp.br.debian.org/debian/
+Suites: trixie-backports
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Atualização geral: 
+#apt update
+#apt upgrade
+#apt full-upgrade
+#apt autoremove --purge
+#apt clean
+#reboot
+
+Endereço para ver os tutoriais do kretcheu:
+https://salsa.debian.org/kretcheu/tutoriais/
+
+Ver se um pacote está instalado:
+#dpkg -l | grep bash-completion 
+
+Ver quais serviços estão rodando:
+systemctl list-units --type=service --state=running
+
+Ver todos os serviçcos instalados:
+systemctl list-unit-files --type=service
+
+Disponibilizar a rede para a máquina virtual:
+#systemctl status libvirtd
+#virsh net-list --all
+#virsh net-start default
+#virsh net-autostart default
+
+Instalar grub para secure-boot:
+#apt install grub-efi-amd64-signed
+#grub-install –target x86_64-efi /dev/sda
+#update-grub
+
+Verificar se o discard está operando e ativá-lo se preciso:
+#systemctl status fstrim.timer
+
+Identificar a placa de rede wifi:
+#lspci -knn | grep -i net
+RTL 8852BE Realtek 
+#apt install firmaware-realtek
+
+Ver os erros de boot e outras mensagens:
+#dmesg -l err,warn
+#dmesg | grep -i usb
+#dmesg | grep -i network
+#dmesg -c (limpar o buffer)
+#journalctl -b -u dhcpd.service
+#journalctl -b 
+
+Fazer download de pacotes deb:
+#apt install nomepacote –download-only
+Salvos em: /var/cache/apt/archives
+Instalar: dpkg -i nome/pacote
+
+Fazer pen drive bootável:
+Com iso:
+dd if=/arquivo.iso of=/dev/sdb status=progress
+Arrumar o pen-drive com o fdisk
+Com disco-virtual:
+fallocate -l 8G disco-virtual
+losetup /dev/loop0 -P disco-virtual
+Instalar o debian em /dev/loop0
+losetup -d /dev/loop0
+dd if=disco-virtual of=/dev/sdb bs=16M oflag=sync status=progress
+Arrumar o pen-drive com o fdisk
+
+Rust:
+#dnf install rust cargo
+#source "$HOME/.cargo/env"
+#rustc --version
+#cargo --version
+#cargo new hello_world
+#cd hello_world
+#micro scr/main
+fn main() {
+    println!("Hello, world!");
+}
+#cargo run
+https://doc.rust-lang.org/book/?hl=pt-BR
+https://doc.rust-lang.org/rust-by-example/?hl=pt-BR
+
+Ativar a rede s/fio iwd:
+#systemctl enable –now iwd
+#iwctl station wlan0 connect Carlos
+Para editar /etc/iwd/main.conf
+
+Acessar o pc pelo celular via ssh:
+Checar se o ssh server está rodando no pc:
+#sudo systemctl status ssh
+Pegar o enderećo ip do pc:
+#ip a
+Instalar o termux no celular pelo F-droid.
+No termux, instalar o openssh:
+$dpk install openssh
+$ssh carlos@endereço_IP_do_Pc_WiFi
+
+Dicas VIM:
+- /palavra procurar pra frente
+ (n próxima N anterior).
+- ?palavra procurar pra trás.
+- /Palavra/c não maiusc e minusc
+- * procura pra frente a palavra
+- # procura pra trás a palavra
+- u desfazer ação.
+- yy copiar a linha
+- dd recortar a linha
+- p colar no cursor
+- yw copiar palavra
+- v entrar no modo visual
+- y copiar o selec no visual
+- d recortar o selec no visual
+- ctrl+v selecionar bloco
+- :w nome salvar com outro nome
+- :set nohlsearc Desmarca buscadas
+
+Ver os layouts disponíveis:
+#localectl list-x11-keymap-models/-layouts/variants us/-options
+
+Serviços de rede:
+#sudo systemctl start systemd-networkd (inicia serviço de rede)
+#sudo systemctl start iwd (inicia o wi-fi)
+systemd-networkd: configura as interfaces em /etc/systemd/network ethernet.network
+[Match]
+Name=enp1s0 (placa de rede ip a)
+[Network]
+DHCP=yes
+
+wlan0.network
+[Match]
+Name=wlan0
+[Network]
+DHCP=yes
+
+Verificar se eles rodando com o systemctl status:
+systemd-networkd: configura as redes
+systemd-hostnamed: nome host
+systemd-resolved: DNS
+
+Montar para dar manutenção:
+#losetup /dev/loop0 -P disco-virtual
+#mount /dev/loop0p2 /mnt
+#mount /dev/loop0p1 /mnt/boot/efi
+#for f in dev dev/pts proc sys sys/firmware/efi/efivars; do
+>mount --bind /$f /mnt/$f
+>done
+#chroot /mnt
+&
+&
+&
+#exit 
+#umount -R /mnt
+#losetup -d /dev/loop0
+
+Instalar o systemd-boot:
+apt update
+apt install systemd-boot
+Configurar o loader:
+nvim /boot/efi/loader/loader.conf
+Configurar as entradas:
+cd /boot/efi/loader/entries
+
+Caminho de boot padrão ou fallback: 
+/boot/efi/EFI/BOOT/BOOTX64.EFI
+
+Localização do intel-ucode:
+/usr/lib/firmware/intel-ucode
+
+Boot com UKI:
+#apt install systemd-ukify
+#apt install dracut 
+#dracut -fv "/tmp/initrd.img-$(uname -r)" $(uname -r)
+#ukify build --linux="/boot/vmlinuz-$(uname -r)" \
+>--initrd="/tmp/initrd.img-$(uname -r)" \
+>--cmdline="root=LABEL=ROOTUKI ro" \
+>--output="/boot/efi/EFI/BOOT/BOOTx64.EFI
+
+Remover o grub:
+#apt purge grub\* --allow-remove-essential
+#apt autoremove
+
+Ver em qual pacote tem determinado arquivo:
+#apt update
+#apt install apt-file
+#apt-file update # Atualiza o cache do apt-file
+#apt-file search systemd-ukify
+
+Upgrade de Firmware:
+- dnf install fwupd-efi
+- fwupdmgr get-devices
+- fwupdmgr refresh
+- fwupdmgr get-updates
+- fwupdmgr update
+
+Estilo da Fonte no terminal:
+\e[0;32;40m
+Fonte:
+0-nenhum, 1-negrito, 4-sublinhado, 5-piscante, 7-reverso, 8-oculto
+Cor da fonte:
+30-preto, 31-vermelho, 32-verde, 33-amarelo, 34-azul, 35-magenta, 36-ciano, 37-branco
+Cor do fundo:
+40-preto, 41-vermelho, 42-verde, 43-amarelo, 44-azul, 45-magenta, 46-ciano, 47-branco.
+
+Dicas terminal:
+Editar prompt do usuário:
+#micro .bashrc 
+PS1='\e[0;32m\u@\h\e[0;37m:\e[0;34m\w\e[0;37m $ ' 
+Editar prompt do root:
+#micro .bashrc
+PS1='\e[0;31m\u@\h\e[0;37m:\e[0;35m\w\e[0;37m # '
+
+Comandos:
+- chown: novodono arquivo
+- chgrp: novogrupo arquivo
+- ip addr show: ver ip
+- unxz nomedoarquivo.xz: descompactar xz
+- tar -xvzf arquivo.tar.gz
+- tar -czvf meus_arquivos.tar.gz arquivo1.txt arquivo2.pdf imagem.jpg
+- localectl status
+- localectl set-keymap us-acentos
+- localectl list-keymaps
+- loadkeys us-acentos
+- unzip archive.zip
+- fc-list: ver as fontes instaladas
+- df -h: ver discos
+- find . -name *.txt : procurar pelo arquivo
+- chmod +x arquivo : deixa o arquivo executável
+
+Atalhos do sistema:
+Ctrl+=  Aumenta o tamanho da fonte no term
+Ctrl+- Diminui o tamanho da fonte do term
+W+Space Abre o menu
+W+Backspace toggle Maximiza 
+W+\ Minimiza
+W+q fecha 
+Alt+Tab ver janelas abertas
+W+g Google Chromium
+W+Return Terminal 
+
+Como usar chave para autenticar em servidor ssh:
+1 Criar o par de chaves.
+Primeiro é necessário criar um par de chaves, uma pública e uma privada.\
+Iremos usar um chave criptográfica para criptografar a chave privada, afim de não deixá-la vulnerável a ser copiada.
+```
+ssh-keygen -t rsa -b 4096 -C comentario
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/kretcheu/.ssh/id_rsa): <ENTER>
+Enter passphrase (empty for no passphrase): <Chave criptográfica da chave privada>
+Enter same passphrase again: <Repetir chave criptográfica da chave privada>
+Your identification has been saved in /home/kretcheu/.ssh/id_rsa
+Your public key has been saved in /home/kretcheu/.ssh/id_rsa.pub
+The key fingerprint is:
+SHA256:oikdbxRJ4cunauADZLv0EmXWcuLEylQ1y/m3GX+iaQs comentario
+The key's randomart image is:
++---[RSA 4096]----+
+|    .oo.         |
+|   ..o+.         |
+|  o .++          |
+| + O +.o         |
+|= O = =.So       |
+|.*.o * +. =      |
+|.o=.+ +E o o .   |
+| ooo.o  ..o o    |
+|  .o.   .+.      |
++----[SHA256]-----+
+```
+Dois arquivos serão criados no diretório *~/.ssh/*:
+```
+id_rsa.pub - chave pública
+id_rsa - chave privada (criptografada com a chave criptográfica fornecida>
+```
+2 Copiar a chave para o servidor.
+Iremos copiar a chave pública para o servidor. Você precisa ter um usuário válido no servidor, nesse exemplo o usuário chama usuario. Se o usuário do servidor tiver o mesmo nome que o usuário local, não é necessário digitar. A linha de comando será:
+
+#ssh-copy-id usuario-no-servidor@ip-ou-nome-do-servidor
+
+#ssh-copy-id usuario@192.168.100.134
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/kretcheu/.ssh/id_rsa.pub"
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+usuario@192.168.100.134's password: <senha do usuario no servidor>
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'usuario@192.168.100.134'"
+and check to make sure that only the key(s) you wanted were added.
+
+3 Acessar o servidor.
+#ssh usuario@192.168.100.134
+Enter passphrase for key '/home/kretcheu/.ssh/id_rsa': <Chave criptográfica da chave privada>
+Linux mini 5.6.2-gnu #1.0 SMP Tue Sep 27 12:35:59 EST 1983 x86_64
+
+The programs included with the Debian GNU/Linux system are free software; the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+
+usuario@servidor:~$
+
+4 Copiar a chave para o root.
+Caso queira acessar diretamente como root, vai precisar copiar a chave para o diretório do root. Naturalmente que para isso precisa ter as permissões necessárias.
+
+Logado como usuário regular use `su` ou `sudo` para ter as permissões de root.
+
+Com su:
+```
+usuario@servidor:~$ su
+Senha: <senha do usuário root no servidor>
+root@servidor#
+
+cat /home/usuario/.ssh/authorized_keys >>/root/.ssh/authorized_keys
+exit
+exit
+```
+Com sudo:
+```
+usuario@servidor:~$
+sudo cat /home/usuario/.ssh/authorized_keys >>/root/.ssh/authorized_keys
+[sudo] senha para usuario: <senha do usuário no servidor>
+exit
+```
+Obs. Usei `cat` para preservar outras chaves que o arquivo pode conter.
+
+5 Acessar como root.
+
+ssh root@192.168.100.134
+
+Enter passphrase for key '/home/kretcheu/.ssh/id_rsa': <Chave criptográfica da chave privada>
+Linux servidor 5.6.2-gnu #1.0 SMP Tue Sep 27 12:35:59 EST 1983 x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+
+root@servidor#
+
+Trocar passphrase da chave privada
+
+#ssh-keygen -f id_rsa -p
+
+
+
+
+
