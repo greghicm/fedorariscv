@@ -4,7 +4,7 @@ Debian Trixie
 #lsblk
 #cfdisk /dev/loop0
 GPT disk label
-128M type Efisystem
+100M type Efisystem
 16G type linux swap
 Restante type linux root (x86-64)
 export PATH="/usr/sbin:$PATH"
@@ -35,7 +35,7 @@ $apt install micro
 $micro /etc/apt/source.list.d/debian.sources 
 Components: main contrib non-free non-free-firmware
 $apt update
-$apt install linux-image-amd64 grub-efi-amd64 intel-microcode firwmware-linux firmware-linux-nonfree firmware-realtek systemd-resolved iwd pciutils wget git bluez sudo dosfstools debootstrap rfkill bash-completion gnupg build-essential console-setup locales pipewire pipewire-pulse foot labwc pavucontrol fonts-ibm-plex gimp curl nodejs npm mpv obs-studio wl-clipboard xournal imv
+$apt install linux-image-amd64 grub-efi-amd64 intel-microcode firwmware-linux firmware-linux-nonfree firmware-realtek systemd-resolved iwd pciutils wget git bluez sudo dosfstools debootstrap rfkill bash-completion gnupg build-essential console-setup locales pipewire pipewire-pulse foot labwc pavucontrol fonts-ibm-plex gimp curl nodejs npm mpv obs-studio wl-clipboard imv rsync
 $grub-install --removable
 $update-grub
 $passwd
@@ -75,7 +75,7 @@ Name=wlan0
 [Network]
 DHCP=yes
 #systemctl status iwd
-#systemctl start iwd
+#systemctl enable --now iwd
 #iwctl
 [iwd]#device list
 [iwd]#station wlan0 scan
@@ -83,7 +83,7 @@ DHCP=yes
 [iwd]#station wlan0 connect SSID
 [iwd]#exit
 
-#systemctl start systemd-networkd
+#systemctl enable --now systemd-networkd
 #ping google.com.br
 
 Configuração:
@@ -97,7 +97,6 @@ XKBOPTIONS="grp:shift_caps_toggle"
 #hostnamectl set-hostname dell
 #reboot
 
-#systemctl start systemd-networkd
 Instalar google-chrome:
 #wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /etc/apt/keyrings/google-chrome.gpg
 #cd /etc/apt/source.list.d
@@ -115,25 +114,15 @@ Signed-By: /etc/apt/keyrings/google-chrome.gpg
 #cd ~
 
 Configuração inicial:
+#cd ~
+#git clone http://github.com/greghicm/fedorariscv
+#cd fedorariscv
 #mkdir -p ~/.config/labwc
-#micro  ~/.config/labwc/rc.xml
-<labwc_config>
-<keyboard>
-<default />
-<keybind key="W-Return"><action name="Execute" command="foot"/></keybind>
-<keybind key="W-g"><action name="Execute" command="google-chrome"/></keybind>
-</keyboard>
-</labwc_config>
-
-Configurar o foot:
+#cp autostart environment menu.xml rc.xml themerc-override ~/.config/labwc/
 #mkdir ~/.config/foot
-#cp /etc/xdg/foot/foot.ini ~/.config/foot/foot.ini
-#micro ~/.config/foot/foot.ini
-font=IBM Plex Mono:size=12
-initial-window-mode=maximized
-
-Iniciar o labwc:
-#labwc 
+#cp foot.ini ~/.config/foot/
+#mkdir -p ~/.local/share/themes
+#tar -xvf Clia.tar -C ~/.local/share/themes/
 
 Configurar o chrome:
 chrome://flags
@@ -141,70 +130,6 @@ ozone
 Prefered Ozone platform = Wayland
 audio
 Allow WebRTC to ajust the input volume = Disable
-
-Acessar google docs debian para copiar os camandos e configurações abaixo
-
-Configurar o labwc-environment:
-#micro ~/.config/labwc/environment
-XKB_DEFAULT_LAYOUT=us,br
-XKB_DEFAULT_VARIANT=intl,abnt2
-XKB_DEFAULT_MODELS=abnt,abnt2
-XKB_DEFAULT_OPTIONS=grp:shift_caps_toggle
-XCURSOR_THEME=Adwaita
-XCURSOR_SIZE=24
-
-Instalar o labwc-tema:
-#git clone https://github.com/addy-dclxvi/openbox-theme-collections.git
-#cd openbox-theme-collections/
-#cp -r Clia ~/.local/share/themes/Clia
-
-Configurar o labwc-menu:
-#micro ~/.config/labwc/menu.xml
-<openbox_menu>
-<menu id="client-menu">
-<item label="Full Screen"><action name="ToggleFullscreen" /></item>
-<separator />
-<menu id="client-list-combined-menu" label="Running..." />
-</menu>
-<menu id="root-menu">
-<item label="Google"><action name="Execute" command="google-chrome"/></item>
-<item label="Terminal"><action name="Execute" command="foot"/></item>
-<item label="Pavucontrol"><action name="Execute" command="pavucontrol"/></item>
-<item label="Gimp"><action name="Execute" command="gimp"/></item>
-<item label="OBS"><action name="Execute" command="obs"/></item>
-<item label="Exit"><action name="Exit"/></item>
-</menu>
-</openbox_menu>
-
-Configurar o labwc-rc:
-#micro ~/.config/labwc/rc.xml
-<labwc_config>
-<theme><name>Clia</name><cornerRadius>1</cornerRadius><font name="IBM Plex Mono" size="12" /></theme>
-<keyboard>
-<default />
-<keybind key="W-Return"><action name="Execute" command="foot"/></keybind>
-<keybind key="W-g"><action name="Execute" command="google-chrome"/></keybind>
-<keybind key="W-p"><action name="Execute" command="pavucontrol"/></keybind>
-<keybind key="W-Space"><action name="ShowMenu" menu="root-menu"/></keybind>
-<keybind key="W-Backspace"><action name="Togglemaximize"/></keybind>
-<keybind key="W-\"><action name="Iconify"/></keybind>
-<keybind key="W-f"><action name="ToggleFullscreen"/></keybind>
-<keybind key="W-q"><action name="Close"/></keybind>
-</keyboard>
-<mouse>
-<default />
-<context name="Root">
-<mousebind button="Right" action="Press"><action name="ShowMenu" menu="root-menu"/></mousebind>
-</context>
-</mouse>
-<windowSwitcher show="yes" preview="yes" outlines="no" allWorkspaces="no">
-<fields>
-<field content="desktop_entry_name" width="80%" />
-<field content="state" width="10%" />
-<field content="type_short" width="10%"/>
-</fields>
-</windowSwitcher>
-</labwc_config>
 
 Instalar o Gemini cli:
 #sudo npm install -g @google/gemini-cli
@@ -216,14 +141,14 @@ Instalar o gstreamer:
 Instalar o wf-recorder, grim, slurp e ffmpeg:
 #sudo apt install ffmpeg wf-recorder grim slurp
 
-Dicas para uso do sistema:
+VÍDEO E IMAGEM:
 Abrir vídeo:
 #mpv nomedovideo
 
 Abrir imagens:
 #imv nomedaimagem
 #imv . (navega nas imagens do diretório atual)
-setas esquerda e diretira navega entre as imagens abertas e setas para cima e baixa aumenta e diminui o zoom
+setas esquerda e direita navega entre as imagens abertas e setas para cima e baixa aumenta e diminui o zoom
 
 Abrir a imagem da câmera:
 #gst-launch-1.0 v4l2src device=/dev/video0 ! videoconvert ! waylandsink
@@ -239,8 +164,22 @@ Iniciar o `ffmpeg` (ou `gstreamer`) lendo do pipe:
 Em outro terminal, iniciar o `wf-recorder` escrevendo no pipe:
 #wf-recorder -f /tmp/youtube.mkv -c libx264 --framerate 30 -p crf=23 --audio --audio-codec aac
 
-#Capturar tela (printscreen):
-grim -g "$(slurp)" ~/screenshot.png
+Capturar tela (printscreen):
+#grim -g "$(slurp)" ~/screenshot.png
+Atalho W+p capta a tela inteira
+
+MANUTENÇÃO DO SISTEMA:
+Atualização geral: 
+#apt update
+#apt upgrade
+#apt full-upgrade
+#apt autoremove --purge
+#apt clean
+#reboot
+
+Backup do home:
+#mount /dev/sda2/ /mnt
+#sudo rsync -av --delete --exclude-from='.lista_de_exclusao.txt' /home/carlos /mnt/backup
 
 Editar o grub:
 #micro /etc/default/grub
@@ -280,14 +219,6 @@ URIs: http://ftp.br.debian.org/debian/
 Suites: trixie-backports
 Components: main contrib non-free non-free-firmware
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-
-Atualização geral: 
-#apt update
-#apt upgrade
-#apt full-upgrade
-#apt autoremove --purge
-#apt clean
-#reboot
 
 Endereço para ver os tutoriais do kretcheu:
 https://salsa.debian.org/kretcheu/tutoriais/
@@ -375,25 +306,6 @@ No termux, instalar o openssh:
 $dpk install openssh
 $ssh carlos@endereço_IP_do_Pc_WiFi
 
-Dicas VIM:
-- /palavra procurar pra frente
- (n próxima N anterior).
-- ?palavra procurar pra trás.
-- /Palavra/c não maiusc e minusc
-- * procura pra frente a palavra
-- # procura pra trás a palavra
-- u desfazer ação.
-- yy copiar a linha
-- dd recortar a linha
-- p colar no cursor
-- yw copiar palavra
-- v entrar no modo visual
-- y copiar o selec no visual
-- d recortar o selec no visual
-- ctrl+v selecionar bloco
-- :w nome salvar com outro nome
-- :set nohlsearc Desmarca buscadas
-
 Ver os layouts disponíveis:
 #localectl list-x11-keymap-models/-layouts/variants us/-options
 
@@ -432,33 +344,6 @@ Montar para dar manutenção:
 #umount -R /mnt
 #losetup -d /dev/loop0
 
-Instalar o systemd-boot:
-apt update
-apt install systemd-boot
-Configurar o loader:
-nvim /boot/efi/loader/loader.conf
-Configurar as entradas:
-cd /boot/efi/loader/entries
-
-Caminho de boot padrão ou fallback: 
-/boot/efi/EFI/BOOT/BOOTX64.EFI
-
-Localização do intel-ucode:
-/usr/lib/firmware/intel-ucode
-
-Boot com UKI:
-#apt install systemd-ukify
-#apt install dracut 
-#dracut -fv "/tmp/initrd.img-$(uname -r)" $(uname -r)
-#ukify build --linux="/boot/vmlinuz-$(uname -r)" \
->--initrd="/tmp/initrd.img-$(uname -r)" \
->--cmdline="root=LABEL=ROOTUKI ro" \
->--output="/boot/efi/EFI/BOOT/BOOTx64.EFI
-
-Remover o grub:
-#apt purge grub\* --allow-remove-essential
-#apt autoremove
-
 Ver em qual pacote tem determinado arquivo:
 #apt update
 #apt install apt-file
@@ -472,6 +357,7 @@ Upgrade de Firmware:
 - fwupdmgr get-updates
 - fwupdmgr update
 
+DICAS DE USO DO TERMINAL:
 Estilo da Fonte no terminal:
 \e[0;32;40m
 Fonte:
@@ -481,7 +367,6 @@ Cor da fonte:
 Cor do fundo:
 40-preto, 41-vermelho, 42-verde, 43-amarelo, 44-azul, 45-magenta, 46-ciano, 47-branco.
 
-Dicas terminal:
 Editar prompt do usuário:
 #micro .bashrc 
 PS1='\e[0;32m\u@\h\e[0;37m:\e[0;34m\w\e[0;37m $ ' 
@@ -517,112 +402,68 @@ Alt+Tab ver janelas abertas
 W+g Google Chromium
 W+Return Terminal 
 
-Como usar chave para autenticar em servidor ssh:
-1 Criar o par de chaves.
-Primeiro é necessário criar um par de chaves, uma pública e uma privada.\
-Iremos usar um chave criptográfica para criptografar a chave privada, afim de não deixá-la vulnerável a ser copiada.
-```
-ssh-keygen -t rsa -b 4096 -C comentario
-Generating public/private rsa key pair.
-Enter file in which to save the key (/home/kretcheu/.ssh/id_rsa): <ENTER>
-Enter passphrase (empty for no passphrase): <Chave criptográfica da chave privada>
-Enter same passphrase again: <Repetir chave criptográfica da chave privada>
-Your identification has been saved in /home/kretcheu/.ssh/id_rsa
-Your public key has been saved in /home/kretcheu/.ssh/id_rsa.pub
-The key fingerprint is:
-SHA256:oikdbxRJ4cunauADZLv0EmXWcuLEylQ1y/m3GX+iaQs comentario
-The key's randomart image is:
-+---[RSA 4096]----+
-|    .oo.         |
-|   ..o+.         |
-|  o .++          |
-| + O +.o         |
-|= O = =.So       |
-|.*.o * +. =      |
-|.o=.+ +E o o .   |
-| ooo.o  ..o o    |
-|  .o.   .+.      |
-+----[SHA256]-----+
-```
-Dois arquivos serão criados no diretório *~/.ssh/*:
-```
-id_rsa.pub - chave pública
-id_rsa - chave privada (criptografada com a chave criptográfica fornecida>
-```
-2 Copiar a chave para o servidor.
-Iremos copiar a chave pública para o servidor. Você precisa ter um usuário válido no servidor, nesse exemplo o usuário chama usuario. Se o usuário do servidor tiver o mesmo nome que o usuário local, não é necessário digitar. A linha de comando será:
+CONFIGURAÇÃO DO SISTEMA LABWC E FOOT:
 
-#ssh-copy-id usuario-no-servidor@ip-ou-nome-do-servidor
+Configurar o labwc-environment:
+#micro ~/.config/labwc/environment
+XKB_DEFAULT_LAYOUT=us,br
+XKB_DEFAULT_VARIANT=intl,abnt2
+XKB_DEFAULT_MODELS=abnt,abnt2
+XKB_DEFAULT_OPTIONS=grp:shift_caps_toggle
+XCURSOR_THEME=Adwaita
+XCURSOR_SIZE=24
 
-#ssh-copy-id usuario@192.168.100.134
-/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/kretcheu/.ssh/id_rsa.pub"
-/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
-/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
-usuario@192.168.100.134's password: <senha do usuario no servidor>
+Configurar o labwc-menu:
+#micro ~/.config/labwc/menu.xml
+<openbox_menu>
+<menu id="client-menu">
+<item label="Full Screen"><action name="ToggleFullscreen" /></item>
+<separator />
+<menu id="client-list-combined-menu" label="Running..." />
+</menu>
+<menu id="root-menu">
+<item label="Google"><action name="Execute" command="google-chrome"/></item>
+<item label="Terminal"><action name="Execute" command="foot"/></item>
+<item label="Pavucontrol"><action name="Execute" command="pavucontrol"/></item>
+<item label="Gimp"><action name="Execute" command="gimp"/></item>
+<item label="OBS"><action name="Execute" command="obs"/></item>
+<item label="Exit"><action name="Exit"/></item>
+</menu>
+</openbox_menu>
 
-Number of key(s) added: 1
+Configurar o labwc-rc:
+#micro ~/.config/labwc/rc.xml
+<labwc_config>
+<theme><name>Clia</name><cornerRadius>1</cornerRadius><font name="IBM Plex Mono" size="12" /></theme>
+<keyboard>
+<default />
+<keybind key="W-Return"><action name="Execute" command="foot"/></keybind>
+<keybind key="W-g"><action name="Execute" command="google-chrome"/></keybind>
+<keybind key="W-p"><action name="Execute" command="pavucontrol"/></keybind>
+<keybind key="W-Space"><action name="ShowMenu" menu="root-menu"/></keybind>
+<keybind key="W-Backspace"><action name="Togglemaximize"/></keybind>
+<keybind key="W-\"><action name="Iconify"/></keybind>
+<keybind key="W-f"><action name="ToggleFullscreen"/></keybind>
+<keybind key="W-q"><action name="Close"/></keybind>
+</keyboard>
+<mouse>
+<default />
+<context name="Root">
+<mousebind button="Right" action="Press"><action name="ShowMenu" menu="root-menu"/></mousebind>
+</context>
+</mouse>
+<windowSwitcher show="yes" preview="yes" outlines="no" allWorkspaces="no">
+<fields>
+<field content="desktop_entry_name" width="80%" />
+<field content="state" width="10%" />
+<field content="type_short" width="10%"/>
+</fields>
+</windowSwitcher>
+</labwc_config>
 
-Now try logging into the machine, with:   "ssh 'usuario@192.168.100.134'"
-and check to make sure that only the key(s) you wanted were added.
-
-3 Acessar o servidor.
-#ssh usuario@192.168.100.134
-Enter passphrase for key '/home/kretcheu/.ssh/id_rsa': <Chave criptográfica da chave privada>
-Linux mini 5.6.2-gnu #1.0 SMP Tue Sep 27 12:35:59 EST 1983 x86_64
-
-The programs included with the Debian GNU/Linux system are free software; the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
-
-Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-permitted by applicable law.
-
-usuario@servidor:~$
-
-4 Copiar a chave para o root.
-Caso queira acessar diretamente como root, vai precisar copiar a chave para o diretório do root. Naturalmente que para isso precisa ter as permissões necessárias.
-
-Logado como usuário regular use `su` ou `sudo` para ter as permissões de root.
-
-Com su:
-```
-usuario@servidor:~$ su
-Senha: <senha do usuário root no servidor>
-root@servidor#
-
-cat /home/usuario/.ssh/authorized_keys >>/root/.ssh/authorized_keys
-exit
-exit
-```
-Com sudo:
-```
-usuario@servidor:~$
-sudo cat /home/usuario/.ssh/authorized_keys >>/root/.ssh/authorized_keys
-[sudo] senha para usuario: <senha do usuário no servidor>
-exit
-```
-Obs. Usei `cat` para preservar outras chaves que o arquivo pode conter.
-
-5 Acessar como root.
-
-ssh root@192.168.100.134
-
-Enter passphrase for key '/home/kretcheu/.ssh/id_rsa': <Chave criptográfica da chave privada>
-Linux servidor 5.6.2-gnu #1.0 SMP Tue Sep 27 12:35:59 EST 1983 x86_64
-
-The programs included with the Debian GNU/Linux system are free software;
-the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
-
-Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-permitted by applicable law.
-
-root@servidor#
-
-Trocar passphrase da chave privada
-
-#ssh-keygen -f id_rsa -p
-
-
-
-
-
+Configurar o foot:
+#mkdir ~/.config/foot
+#cp /etc/xdg/foot/foot.ini ~/.config/foot/foot.ini
+#micro ~/.config/foot/foot.ini
+font=IBM Plex Mono:size=12
+initial-window-mode=maximized
