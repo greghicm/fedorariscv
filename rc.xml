@@ -4,17 +4,17 @@
 <default />
 <keybind key="W-Return"><action name="Execute" command="foot"/></keybind>
 <keybind key="W-g"><action name="Execute" command="google-chrome"/></keybind>
-<keybind key="W-p"><action name="Execute" command="pavucontrol"/></keybind>
+<keybind key="W-p"><action name="Execute" command="grim ~/Pictures/screenshot.png"/></keybind>
+<keybind key="W-x"><action name="Execute" command="/home/carlos/.config/labwc/scripts/screenshot.sh"/></keybind>
 <keybind key="W-Space"><action name="ShowMenu" menu="root-menu"/></keybind>
-<keybind key="W-Backspace"><action name="Togglemaximize"/></keybind>
-<keybind key="W-\"><action name="Iconify"/></keybind>
+<keybind key="W-Tab"><action name="ShowMenu" menu="client-list-combined-menu"/></keybind>
 <keybind key="W-f"><action name="ToggleFullscreen"/></keybind>
-<keybind key="W-q"><action name="Close"/></keybind>
 </keyboard>
 <mouse>
 <default />
 <context name="Root">
 <mousebind button="Right" action="Press"><action name="ShowMenu" menu="root-menu"/></mousebind>
+<mousebind button="Left" action="Press"><action name="ShowMenu" menu="client-list-combined-menu"/></mousebind>
 </context>
 </mouse>
 <windowSwitcher show="yes" preview="yes" outlines="no" allWorkspaces="no">
