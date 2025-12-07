@@ -1,17 +1,21 @@
 <openbox_menu>
 <menu id="client-menu">
 <item label="Full Screen"><action name="ToggleFullscreen" /></item>
-<separator />
 <menu id="client-list-combined-menu" label="Running..." />
 <menu id="time" label="Clock" execute="/home/carlos/.config/labwc/scripts/clock.sh" />
 </menu>
 <menu id="root-menu">
 <item label="Google"><action name="Execute" command="google-chrome"/></item>
 <item label="Terminal"><action name="Execute" command="foot"/></item>
-<item label="Pavucontrol"><action name="Execute" command="pavucontrol"/></item>
-<item label="Gimp"><action name="Execute" command="gimp"/></item>
+<item label="Audio"><action name="Execute" command="pavucontrol"/></item>
+<item label="Krita"><action name="Execute" command="krita"/></item>
 <item label="OBS"><action name="Execute" command="obs"/></item>
-<item label="Xournal"><action name="Execute" command="xournal"/></item>
-<item label="Exit"><action name="Exit"/></item>
+<item label="Writer"><action name="Execute" command="focuswriter"/></item>
+<item label="Câmera Virtual"><action name="Execute" command="foot sudo modprobe v4l2loopback devices=1 video_nr=9 card_label= &quot;virtual &quot; exclusive_caps=1"/></item>
+<menu id="sessao-menu" label="Sair"> 
+<item label="Reiniciar"><action name="Execute"><command>systemctl reboot</command></action></item>
+<item label="Desligar"><action name="Execute"><command>systemctl poweroff</command></action></item>
+<item label="BIOS"><action name="Execute"><command>systemctl reboot --firmware-setup</command></action></item>
+</menu>
 </menu>
 </openbox_menu>
